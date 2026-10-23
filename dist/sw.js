@@ -1,4 +1,4 @@
-const CACHE='zhixi-v1';
+const CACHE='zhixi-v2';
 const FILES=['./','index.html','styles.css','app.js','questions.json','icon.svg','manifest.webmanifest'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('zhixi-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
