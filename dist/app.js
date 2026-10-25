@@ -104,7 +104,7 @@ function submit(){
 }
 function resultHTML(s){
  const rr=Object.entries(s.responses).filter(([id,r])=>r.submitted&&byId.get(id)?.verified),good=rr.filter(([,r])=>r.correct).length,reviewed=Object.values(s.responses).filter(r=>r.submitted).length;
- return `<section class="result" style="margin-bottom:22px"><span class="eyebrow">A LITTLE PROGRESS, EVERY DAY</span><h2>这一组，练完了。</h2><div class="big">${rr.length?Math.round(good/rr.length*100)+'%':'—'}</div><p class="muted small">本组参考正确率 · ${good} / ${rr.length} 道已判分题<br>共查看 ${reviewed} / ${s.ids.length} 题；未提交题目不计入成绩</p><div class="result-buttons"><button class="button primary" data-action="quick" data-mode="wrong">重练错题</button><button class="button secondary" data-action="home">回到学习概览</button></div></section>`;
+ return `<section class="result" style="margin-bottom:22px"><span class="eyebrow">A LITTLE PROGRESS, EVERY DAY</span><h2>这一组，练完了。</h2><div class="big">${rr.length?Math.round(good/rr.length*100)+'%':'—'}</div><p class="muted small">本组参考正确率 · ${good} / ${rr.length} 道已判分题<br>共查看 ${reviewed} / ${s.ids.length} 题；未提交题目不计入成绩</p><div class="result-buttons"><button class="button primary" data-action="retry-wrong">重练错题</button><button class="button secondary" data-action="home">回到学习概览</button></div></section>`;
 }
 function list(){
  const title={wrong:['我的错题','答错过的题，会一直留在这里。重新理解后，可以标记已掌握。'],favorites:['我的收藏','把值得再看一眼的知识，留给下一次复习。'],bank:['全部题库','801道题，支持搜索、按题型筛选，也可查看有歧义的题目。']}[route];
@@ -147,6 +147,7 @@ document.addEventListener('click',event=>{
  else if(action==='review-select'){if(reviewSubmitted)return;const i=Number(el.dataset.option);reviewSelected=reviewQuestion.type==='多选题'?(reviewSelected.includes(i)?reviewSelected.filter(x=>x!==i):[...reviewSelected,i]):[i];if(reviewQuestion.type!=='多选题')submitReview();else drawReview();}
  else if(action==='home')go('home');
  else if(action==='goto-practice'||action==='resume')go('practice');
+ else if(action==='retry-wrong'){if(!wrongs().some(q=>q.verified)){toast('目前没有待复习错题，可以开始下一组练习。');return;}start('wrong','','all');}
  else if(action==='quick'){goSetup(el.dataset.mode);}
  else if(action==='start')start($('#mode').value,$('#setup-type').value,$('#size').value);
  else if(action==='select'){
