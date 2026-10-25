@@ -66,19 +66,22 @@ function home(){
  const t=totals(),unfinished=state.session&&!state.session.finished,submitted=unfinished?Object.values(state.session.responses).filter(r=>r.submitted).length:0;
  $('#app').innerHTML=`<section class="hero"><div><span class="eyebrow">YOUR EVERYDAY PROGRESS</span><h1>${t.attempts?'每一次练习，都算数。':'从今天，开始一点积累。'}</h1><p>${unfinished?`上次练习已完成 ${submitted} / ${state.session.ids.length} 题，进度已经为你保留。`:'不必一次学完。每天练习一点，错过的题会被记住，想再看的题随时收藏。'}</p><button class="button lime large" data-action="${unfinished?'resume':'goto-practice'}">${unfinished?'继续上次练习':'开始今天的练习'} <span class="arrow">→</span></button></div><div class="hero-side"><b>${questions.length}</b><span>道题，慢慢掌握</span><span>${questions.filter(q=>q.verified).length} 道可参考判分</span></div></section>
  <div class="stats-grid">${stat('已经练习',t.unique,'题目覆盖 / '+questions.length+' 题')}${stat('累计正确率',t.attempts?t.rate+'%':'—',t.attempts+' 次已判分作答')}${stat('待复习错题',wrongs().length,'重新理解，再做一次')}${stat('我的收藏',favorites().length,'值得多看一眼的题')}</div>
- <div class="section-title"><h2>选择你的练习方式</h2><span>短一点，也是一种进步</span></div><div class="practice-grid">${modeCard('order','01','顺序练习','沿着题目顺序，系统地过一遍。')}${modeCard('random','↝','随机挑战','打乱题序，检验真正的掌握程度。')}${modeCard('wrong','↺','错题重练','把不熟悉的知识，再巩固一次。')}</div>
+ <div class="section-title"><h2>选择你的练习方式</h2><span>短一点，也是一种进步</span></div><div class="practice-grid">${modeCard('order','01','顺序练习','按顺序继续未做题，已做题不会重复出现。')}${modeCard('random','↝','随机挑战','打乱题序，检验真正的掌握程度。')}${modeCard('wrong','↺','错题重练','把不熟悉的知识，再巩固一次。')}</div>
  <div class="bottom-grid"><section class="panel"><h3>我的题型进度</h3>${['单选题','多选题','判断题'].map(type=>{const all=questions.filter(q=>q.type===type&&q.verified),done=all.filter(q=>progress(q).attempts).length;return `<div class="progress-row"><div><span>${type}</span><span>${done} / ${all.length}</span></div><div class="track"><i style="width:${done/all.length*100}%"></i></div></div>`;}).join('')}</section><section class="panel"><h3>给自己的学习提醒</h3><p class="muted small">记录只属于这台设备的当前浏览器。无需账号，也不会上传你的答题记录。</p><button class="button ghost" data-action="export">导出一次备份 ↗</button><p class="muted small">37道版本或歧义题保留说明，默认不参与自动判分。</p></section></div>`;
 }
 function stat(label,value,small){return `<div class="stat"><span class="stat-label"><span class="device-dot"></span>${label}</span><b class="stat-value">${value}</b><small>${small}</small></div>`;}
 function modeCard(mode,symbol,title,desc){return `<button class="practice-card" data-action="quick" data-mode="${mode}"><span class="card-symbol">${symbol}</span><h3>${title}</h3><p>${desc}</p><span class="card-link">开始练习 →</span></button>`;}
 function setup(){
  const last=state.session,finished=last&&last.finished;
- $('#app').innerHTML=`<div class="page-title"><h1>把知识，练成自己的。</h1><p>选一个适合今天的节奏。进度会自动保存，随时可以回来。</p></div>${finished?resultHTML(last):''}<section class="panel"><h3>开始一组新练习</h3><div class="setup"><label>练习方式<select id="mode"><option value="order">顺序练习</option><option value="random">随机练习</option><option value="wrong">错题重练（${wrongs().length}）</option><option value="favorites">收藏练习（${favorites().length}）</option></select></label><label>题目类型<select id="setup-type"><option value="">全部题型</option><option>单选题</option><option>多选题</option><option>判断题</option></select></label><label>每组题数<select id="size"><option value="10">10题 · 热身一下</option><option value="30">30题 · 稳步积累</option><option value="90">90题 · 集中练习</option><option value="all">全部符合条件的题</option></select></label><button class="button primary" data-action="start">开始练习 →</button></div></section><div class="notice" style="margin-top:20px">日常练习默认只包含764道可按参考答案判分的题。有版本差异或歧义的37题，可以到全部题库查看说明、收藏和单独阅读。</div>`;
+ $('#app').innerHTML=`<div class="page-title"><h1>把知识，练成自己的。</h1><p>选一个适合今天的节奏。进度会自动保存，随时可以回来。</p></div>${finished?resultHTML(last):''}<section class="panel"><h3>开始一组新练习</h3><div class="setup"><label>练习方式<select id="mode"><option value="order">顺序练习（继续未做题）</option><option value="random">随机练习</option><option value="wrong">错题重练（${wrongs().length}）</option><option value="favorites">收藏练习（${favorites().length}）</option></select></label><label>题目类型<select id="setup-type"><option value="">全部题型</option><option>单选题</option><option>多选题</option><option>判断题</option></select></label><label>每组题数<select id="size"><option value="10">10题 · 热身一下</option><option value="30">30题 · 稳步积累</option><option value="90">90题 · 集中练习</option><option value="all">全部符合条件的题</option></select></label><button class="button primary" data-action="start">开始练习 →</button></div></section><div class="notice" style="margin-top:20px">日常练习默认只包含764道可按参考答案判分的题。有版本差异或歧义的37题，可以到全部题库查看说明、收藏和单独阅读。</div>`;
 }
 function start(mode='order',type='',size=10){
  let pool=(mode==='wrong'?wrongs():mode==='favorites'?favorites():questions).filter(q=>q.verified&&(!type||q.type===type));
  if(!pool.length){toast('没有符合条件的可判分题目，可以先去题库看看。');return;}
- if(state.session&&!state.session.finished&&!confirm('开始新练习会替换尚未完成的本组进度。已提交的答题、错题和收藏仍会保留。继续吗？'))return;
+ if(mode==='order'){
+  pool=pool.filter(q=>!progress(q).attempts);
+  if(!pool.length){toast('该题型已全部练习过，可切换随机练习或错题重练。');return;}
+ }
  if(mode==='random')for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
  state.session={ids:pool.slice(0,size==='all'?pool.length:Number(size)).map(q=>q.id),index:0,responses:{},mode,createdAt:new Date().toISOString(),finished:false};save();go('practice');
 }
@@ -114,13 +117,37 @@ function list(){
 }
 function row(q){const p=progress(q);return `<article class="question-row"><div class="row-head"><span class="pill ${!q.verified?'warn':''}">${esc(q.type)}</span><small>#${q.number}${!q.verified?' · 版本或歧义':''}${p.attempts?' · 已练 '+p.attempts+' 次':''}</small></div><h3>${esc(q.stem)}</h3><div class="row-bottom"><span class="muted small">${p.wrong?'累计答错 '+p.wrong+' 次':q.verified?'参考答案可判分':'不自动判分'}</span><div class="row-actions">${route==='wrong'?`<button class="button ghost" data-action="master" data-id="${q.id}">已掌握</button>`:''}<button class="star ${state.favorites.includes(q.id)?'on':''}" data-action="favorite" data-id="${q.id}" aria-label="${state.favorites.includes(q.id)?'取消收藏':'收藏'}第${q.number}题">${state.favorites.includes(q.id)?'★':'☆'}</button><button class="button secondary" data-action="open-question" data-id="${q.id}">${q.verified?'练这道题':'查看说明'}</button></div></div></article>`;}
 function empty(where,total){return `<div class="empty"><span class="card-symbol">${where==='favorites'?'☆':'✓'}</span><h3>${total?'没有匹配的题目':where==='wrong'?'暂时没有待复习错题':where==='favorites'?'还没有收藏':'没有题目'}</h3><p>${total?'换一个关键词或筛选条件试试。':where==='wrong'?'答错的题目会自动记录在这里。':where==='favorites'?'练习时点击收藏按钮，就能把题目留在这里。':'请检查题库是否加载成功。'}</p><button class="button secondary" data-action="goto-practice">去练习 →</button></div>`;}
-function openQuestion(id){if(state.session&&!state.session.finished&&!confirm('单题练习会替换当前未完成的本组进度。已提交记录仍会保留，继续吗？'))return;state.session={ids:[id],index:0,responses:{},mode:'single',createdAt:new Date().toISOString(),finished:false};save();go('practice');}
+let reviewQuestion=null,reviewSelected=[],reviewSubmitted=false;
+function goSetup(mode){
+ route='practice';history.replaceState(null,'','#practice');navigation();setup();$('#mode').value=mode;
+ if(state.session&&!state.session.finished)$('#app').insertAdjacentHTML('afterbegin','<div class="notice">上组未完成的题目仍可继续。开始新组后，已提交的记录和收藏会保留。 <button class="button secondary" data-action="resume">继续上组</button></div>');
+ window.scrollTo(0,0);
+}
+function openQuestion(id){
+ if(!byId.has(id))return;
+ reviewQuestion=byId.get(id);reviewSelected=[];reviewSubmitted=false;
+ if(!$('#question-review')){const d=document.createElement('dialog');d.id='question-review';document.body.append(d);}
+ drawReview();$('#question-review').showModal();
+}
+function drawReview(showAnswer=false){
+ const q=reviewQuestion;
+ $('#question-review').innerHTML=`<div class="dialog-head"><h2>题目 #${q.number} · ${esc(q.type)}</h2><button class="button secondary" data-action="close-review">关闭</button></div><h3>${esc(q.stem)}</h3><div class="options">${q.options.map((o,i)=>`<button class="option ${reviewSelected.includes(i)?'selected':''} ${reviewSubmitted&&q.answer.includes(i)?'correct':''}" data-action="review-select" data-option="${i}" ${reviewSubmitted?'disabled':''}><span class="letter">${String.fromCharCode(65+i)}</span>${esc(o)}</button>`).join('')}</div><div class="quiz-actions">${q.type==='多选题'&&!reviewSubmitted?'<button class="button primary" data-action="review-submit">提交答案</button>':''}<button class="button secondary" data-action="review-answer">查看答案与说明</button></div>${showAnswer||reviewSubmitted?`<div class="feedback"><b>参考答案：${esc(q.reference)}</b><p>${esc(q.note||'本题暂无补充解析。')}</p>${reviewSubmitted?`<p>${!q.verified?'本题不参与判分':equal(reviewSelected,q.answer)?'✓ 回答正确':'回答错误，已记入错题本。'}</p>`:''}</div>`:''}<p class="muted small">单题复习不影响正在进行的整组练习。答案为参考答案，未经平台核验。</p>`;
+}
+function recordAnswer(q,selected){
+ const correct=equal(selected,q.answer),p=progress(q);p.attempts++;p.correct+=correct?1:0;p.wrong+=correct?0:1;p.activeWrong=p.activeWrong||!correct;p.lastAt=new Date().toISOString();state.progress[q.id]=p;
+ state.history.push({qid:q.id,selected:[...selected],correct,at:p.lastAt});state.history=state.history.slice(-10000);
+}
+function submitReview(){if(reviewSubmitted)return;if(reviewQuestion.verified&&!reviewSelected.length){toast('请先选择答案。');return;}reviewSubmitted=true;if(reviewQuestion.verified)recordAnswer(reviewQuestion,reviewSelected);save();render();drawReview(true);}
 function exportBackup(){const payload={app:'zhixi-study',exportedAt:new Date().toISOString(),...state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='知习备份-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('备份已导出，请妥善保存。');}
 document.addEventListener('click',event=>{
  const el=event.target.closest('[data-action]');if(!el||el.disabled||!state)return;const action=el.dataset.action,id=el.dataset.id;
- if(action==='home')go('home');
+ if(action==='close-review'){$('#question-review').close();}
+ else if(action==='review-answer')drawReview(true);
+ else if(action==='review-submit')submitReview();
+ else if(action==='review-select'){if(reviewSubmitted)return;const i=Number(el.dataset.option);reviewSelected=reviewQuestion.type==='多选题'?(reviewSelected.includes(i)?reviewSelected.filter(x=>x!==i):[...reviewSelected,i]):[i];if(reviewQuestion.type!=='多选题')submitReview();else drawReview();}
+ else if(action==='home')go('home');
  else if(action==='goto-practice'||action==='resume')go('practice');
- else if(action==='quick')start(el.dataset.mode,'',10);
+ else if(action==='quick'){goSetup(el.dataset.mode);}
  else if(action==='start')start($('#mode').value,$('#setup-type').value,$('#size').value);
  else if(action==='select'){
   const q=current(),r=response(q);if(r.submitted)return;const i=Number(el.dataset.option);
@@ -132,7 +159,7 @@ document.addEventListener('click',event=>{
  else if(action==='jump'){state.session.index=Number(el.dataset.index);save();render(true);}
  else if(action==='next'){
   const s=state.session;if(s.index<s.ids.length-1){s.index++;save();render(true);}
-  else {const count=Object.values(s.responses).filter(r=>r.submitted).length;if(count<s.ids.length&&!confirm(`本组还有 ${s.ids.length-count} 道未提交，仍要结束本组吗？`))return;s.finished=true;save();render(true);}
+  else {const missing=s.ids.findIndex(id=>!s.responses[id]?.submitted);if(missing>=0){s.index=missing;save();render(true);toast('已跳到本组尚未提交的题目。');return;}s.finished=true;save();render(true);}
  }
  else if(action==='favorite'){
   if(!byId.has(id))return;const exists=state.favorites.includes(id);state.favorites=exists?state.favorites.filter(x=>x!==id):[...state.favorites,id];save();render();toast(exists?'已取消收藏':'已加入收藏');
@@ -169,7 +196,7 @@ async function init(){
   $('#save-status').textContent=state.updatedAt?'✓ 已恢复此设备的上次记录':'✓ 自动保存已就绪 · 仅此设备';
   if(!storageHealthy)$('#save-status').textContent='本地记录读取异常 · 请检查备份';
   route=NAV.some(([id])=>id===location.hash.slice(1))?location.hash.slice(1):'home';render();
-  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+  if('serviceWorker' in navigator){let refreshing=false;const hadController=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(hadController&&!refreshing){refreshing=true;location.reload();}});navigator.serviceWorker.register('sw.js').then(r=>r.update()).catch(()=>{});}
  }catch(e){$('#app').innerHTML='<section class="empty"><h2>暂时无法打开题库</h2><p>请检查网络并刷新。首次使用需要通过网站地址访问，不能直接双击本地网页文件。</p></section>';}
 }
 init();
